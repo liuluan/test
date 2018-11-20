@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://getahead.org/dwr/dwr20.dtd">
+
+<dwr>
+	<allow>
+		<create creator="spring" javascript="polService">
+			<param name="beanName" value="PolygonAction" />
+		</create>
+		<convert converter="bean" match="dao.Polygon">
+		   <param name="include" value="id,pointscount,arrpoints,type" />
+		</convert>
+		
+		<create creator="spring" javascript="cirService">
+			<param name="beanName" value="CircleAction" />
+		</create>
+		<convert converter="bean" match="dao.Circle">
+		   <param name="include" value="id,centerpoint,radius,type" />
+		</convert>
+	</allow>
+</dwr>

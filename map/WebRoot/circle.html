@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>GRACE实例：圆形绘制</title>
+		 <script type='text/javascript' src='/map/dwr/engine.js'></script>
+		<script type='text/javascript' src='/map/dwr/util.js'></script>
+		<script type='text/javascript'
+			src='/map/dwr/interface/cirService.js'></script>
+		<link rel="stylesheet" type="text/css"
+			href="/Public/css/demo.Default.css" />
+		<script language="javascript"
+			src="http://webapi.amap.com/maps?v=1.2&key=12b94ad58f95eb8e946dd1588c65d658"></script>
+		<script language="javascript">
+var mapObj,toolBar,mouseTool;
+var cirlCenter,cirlRadius;//定义全局变量圆心和半径
+//初始化地图对象，加载地图
+function mapInit(){
+	mapObj = new AMap.Map("iCenter");
+	//在地图中添加ToolBar插件
+	mapObj.plugin(["AMap.ToolBar"],function(){		
+		toolBar = new AMap.ToolBar();
+		mapObj.addControl(toolBar);		
+	});
+	
+	//设置圆的属性
+	var circleOption = {
+    strokeColor:"#FF33FF",
+	fillColor:"#FF99FF",
+	fillOpacity:0.5,
+    strokeOpacity:1,
+    strokeWeight:2	
+	};
+	
+	//在地图中添加MouseTool插件   
+    mapObj.plugin(["AMap.MouseTool"],function(){    
+         mouseTool = new AMap.MouseTool(mapObj);    
+         mouseTool.circle(circleOption);   //使用鼠标工具绘制圆
+      	AMap.event.addListener(mouseTool,"draw",function(e){
+			var drawObj = e.obj;  //obj属性就是绘制完成的覆盖物对象。
+			cirlCenter= e.obj.getCenter();
+			cirlRadius=e.obj.getRadius();
+		});
+   });  
+}
+//清除地图上面的覆盖物
+function moveMyAdd(){
+	mapObj.clearMap();
+}
+
+function save(){
+    var type=document.getElementById('saveType').value;
+ 	if(type=="请选择"){
+ 		alert("请您选择你要保存的名称...");
+ 		return;
+ 	}else{
+ 	   if(cirlCenter!=null&&cirlRadius!=null){
+ 	     var cr=cirlCenter+":"+cirlRadius+":"+type;
+ 	     cirService.addCircle(cr,function(res){
+ 	       if(res){
+ 	         alert("您的圆形标记成功！");
+ 	       }else{
+ 	         alert("您的圆形标记失败！");
+ 	       }
+ 	     });
+ 	   }
+ 	}
+}
+function show(){
+    mapObj.clearMap();
+    var type=document.getElementById('typeShow').value;
+    alert(type);
+ 	if(type=="请选择"){
+ 		alert("请您选择你要显示的名称...");
+ 		return;
+ 	}else{	 		
+ 	  cirService.showCircle(type,function(list){
+ 	    for ( var i = 0; i < list.length; i++) {
+ 	       // alert(list[i][0][0]);
+ 	       // alert(list[i][0][1]);
+ 	       // alert(list[i][1]);
+		   circle= new AMap.Circle({                  
+              id:i,            
+              center:new AMap.LngLat(list[i][0][0],list[i][0][1]),//圆心，基点                  
+              radius:list[i][1],//半径                  
+              strokeColor:"#FF33FF",
+	          fillColor:"#FF99FF",
+	          fillOpacity:0.5,
+              strokeOpacity:1,
+              strokeWeight:2	             
+              }); 
+           mapObj.addOverlays(circle);
+	       //调整视野到合适的位置及级别
+	       mapObj.setFitView();      
+		}
+ 	  });
+ 	}
+}
+
+function clearHis(){
+  cirService.clearHis(function(res){
+    if(res){
+     alert("您的圆形历史标记信息已经清除");
+    }
+  });
+}
+
+</script>
+	</head>
+	<body onLoad="mapInit()">
+		<div>
+			<b>实例:绘制圆形，标记我的信息，并可保存</b>
+		</div>
+		<div id="bodyDiv" style="width: 1000px;">
+			<div
+				style="width: 600px; height: 600px; float: left; border-color: bolck border-width :   2px; border-style: solid;">
+				<div id="iCenter"></div>
+				<div style="padding: 2px 0px 0px 5px; font-size: 12px"></div>
+			</div>
+			<div
+				style="height: 600px; width: 380px; float: right; border-width: 2px; border-style: solid; border-color: red; padding-left: 5px;">
+
+				<p>
+					<input type="button" maxlength="10" value="移除地图上的圆形标记信息" size="20px;"
+						onClick="moveMyAdd()" />
+				</p>
+				<p>
+					<input type="button" maxlength="10" value="保存我的圆形标记信息" size="20px;"
+						onClick="save()" />
+					<select id="saveType" name="polygon.type">
+						<option selected="selected" value="请选择">
+							请选择
+						</option>
+						<option value="小区">
+							小区
+						</option>
+						<option value="学校">
+							学校
+						</option>
+						<option value="公交站">
+							公交站
+						</option>
+					</select>
+				</p>
+				<p>
+					<input type="button" maxlength="10" value="显示我的圆形标记信息" size="20px;"
+						onClick="show()" />
+					<select id="typeShow">
+						<option selected="selected" value="请选择">
+							请选择
+						</option>
+						<option value="小区">
+							小区
+						</option>
+						<option value="学校">
+							学校
+						</option>
+						<option value="公交站">
+							公交站
+						</option>
+					</select>
+				</p>
+				<p>
+					<input type="button" maxlength="10" value="清除历史标记信息" size="20px;"
+						onClick="clearHis()" />
+				</p>
+			</div>
+		</div>
+	</body>
+</html>
